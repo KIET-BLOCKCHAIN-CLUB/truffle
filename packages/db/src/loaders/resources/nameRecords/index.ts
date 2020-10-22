@@ -1,8 +1,5 @@
-import {
-  WorkspaceRequest,
-  toIdObject,
-  WorkspaceResponse
-} from "@truffle/db/loaders/types";
+import { WorkspaceRequest, WorkspaceResponse } from "@truffle/db/loaders/types";
+import { toIdObject } from "@truffle/db/meta";
 
 import { AddNameRecords } from "./add.graphql";
 export { AddNameRecords };
@@ -17,7 +14,7 @@ type ResolveFunc = (
   type: string
 ) => Generator<
   WorkspaceRequest,
-  DataModel.INameRecord | null,
+  DataModel.NameRecord | null,
   WorkspaceResponse
 >;
 
@@ -27,13 +24,13 @@ export function* generateNameRecordsLoad(
   getCurrent: ResolveFunc
 ): Generator<
   WorkspaceRequest,
-  DataModel.INameRecord[],
-  WorkspaceResponse<"nameRecordsAdd", DataModel.INameRecordsAddPayload>
+  DataModel.NameRecord[],
+  WorkspaceResponse<"nameRecordsAdd", DataModel.NameRecordsAddPayload>
 > {
   const nameRecords = [];
   for (const resource of resources) {
     const { name } = resource;
-    const current: DataModel.INameRecord = yield* getCurrent(name, type);
+    const current: DataModel.NameRecord = yield* getCurrent(name, type);
 
     if (current) {
       nameRecords.push({
@@ -56,5 +53,5 @@ export function* generateNameRecordsLoad(
     variables: { nameRecords }
   };
 
-  return result.data.workspace.nameRecordsAdd.nameRecords;
+  return result.data.nameRecordsAdd.nameRecords;
 }

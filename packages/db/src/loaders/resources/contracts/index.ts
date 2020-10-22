@@ -1,9 +1,9 @@
 import {
   LoadedBytecodes,
-  IdObject,
   WorkspaceRequest,
   WorkspaceResponse
 } from "@truffle/db/loaders/types";
+import { IdObject } from "@truffle/db/meta";
 import { CompiledContract } from "@truffle/compile-common";
 
 import { AddContracts } from "./add.graphql";
@@ -13,15 +13,15 @@ export interface LoadableContract {
   contract: CompiledContract;
   path: { sourceIndex: number; contractIndex: number };
   bytecodes: LoadedBytecodes;
-  compilation: IdObject<DataModel.ICompilation>;
+  compilation: IdObject<DataModel.Compilation>;
 }
 
 export function* generateContractsLoad(
   loadableContracts: LoadableContract[]
 ): Generator<
   WorkspaceRequest,
-  DataModel.IContract[],
-  WorkspaceResponse<"contractsAdd", DataModel.IContractsAddPayload>
+  DataModel.Contract[],
+  WorkspaceResponse<"contractsAdd", DataModel.ContractsAddPayload>
 > {
   // we filter out contracts whose bytecode bytes are empty because these are
   // either abstract contracts or interfaces, and do not belong in the db
@@ -56,5 +56,5 @@ export function* generateContractsLoad(
     variables: { contracts }
   };
 
-  return result.data.workspace.contractsAdd.contracts;
+  return result.data.contractsAdd.contracts;
 }

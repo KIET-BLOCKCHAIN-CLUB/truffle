@@ -1,4 +1,7 @@
+import * as graphql from "graphql";
+
 import { CompiledContract } from "@truffle/compile-common";
+import { IdObject } from "@truffle/db/meta";
 
 export interface CompilationData {
   compiler: {
@@ -10,12 +13,12 @@ export interface CompilationData {
 
 export interface SourceData {
   index: number;
-  input: DataModel.ISourceInput;
+  input: DataModel.SourceInput;
   contracts: CompiledContract[];
 }
 
 export interface LoadedSources {
-  [sourcePath: string]: IdObject<DataModel.ISource>;
+  [sourcePath: string]: IdObject<DataModel.Source>;
 }
 
 // we track loaded bytecodes using the same structure as CompilationData:
@@ -25,27 +28,14 @@ export interface LoadedSources {
 export interface LoadedBytecodes {
   sources: {
     contracts: {
-      createBytecode: IdObject<DataModel.IBytecode>;
-      callBytecode: IdObject<DataModel.IBytecode>;
+      createBytecode: IdObject<DataModel.Bytecode>;
+      callBytecode: IdObject<DataModel.Bytecode>;
     }[];
   }[];
 }
 
-type Resource = {
-  id: string;
-};
-
-export type IdObject<R extends Resource = Resource> = {
-  [N in keyof R]: N extends "id" ? string : never;
-};
-
-export const toIdObject = <R extends Resource>({ id }: R): IdObject<R> =>
-  ({
-    id
-  } as IdObject<R>);
-
 export interface WorkspaceRequest {
-  request: string; // GraphQL request
+  request: string | graphql.DocumentNode; // GraphQL request
   variables: {
     [name: string]: any;
   };
@@ -53,11 +43,6 @@ export interface WorkspaceRequest {
 
 export type WorkspaceResponse<N extends string = string, R = any> = {
   data: {
-    workspace: { [RequestName in N]: R };
+    [RequestName in N]: R;
   };
 };
-
-export interface NamedResource {
-  id: string;
-  name: string;
-}
