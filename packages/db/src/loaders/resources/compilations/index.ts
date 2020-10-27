@@ -1,3 +1,4 @@
+import { toIdObject, IdObject } from "@truffle/db/meta";
 import {
   CompilationData,
   LoadedSources,
@@ -7,6 +8,7 @@ import {
 import { AddCompilations } from "./add.graphql";
 export { AddCompilations };
 
+import { FindCompilationContracts } from "./find.graphql";
 export { GetCompilation } from "./get.graphql";
 
 const compilationSourceInputs = ({
@@ -70,4 +72,21 @@ export function* generateCompilationsLoad(
   };
 
   return result.data.compilationsAdd.compilations;
+}
+
+export function* generateCompilationsContracts(
+  compilations: IdObject<DataModel.Compilation>[]
+): Load<IdObject<DataModel.Contract>[], "compilations"> {
+  const result = yield {
+    request: FindCompilationContracts,
+    variables: {
+      ids: compilations.map(({ id }) => id)
+    }
+  };
+
+  const contracts = result.data.compilations
+    .map(({ contracts }) => contracts)
+    .flat();
+
+  return contracts.map(toIdObject);
 }
