@@ -47,6 +47,10 @@ class DefinitionsSchema<C extends Collections> {
         id: ID!
       }
 
+      input QueryFilter {
+        ids: [ID!]
+      }
+
       type Query
       type Mutation
     `;
@@ -148,7 +152,7 @@ abstract class DefinitionSchema<
       ${typeDefs}
 
       extend type Query {
-        ${resources}: [${Resource}]
+        ${resources}(filter: QueryFilter): [${Resource}]
         ${resource}(id: ID!): ${Resource}
       }
 
@@ -182,7 +186,14 @@ abstract class DefinitionSchema<
           resolve: (_, { id }, { workspace }) => workspace.get(resources, id)
         },
         [resources]: {
-          resolve: (_, {}, { workspace }) => workspace.all(resources)
+          resolve: (_, { filter }, { workspace }) =>
+            filter
+              ? workspace.find(resources, {
+                  selector: {
+                    id: { $in: filter.ids }
+                  }
+                })
+              : workspace.all(resources)
         }
       }
     };
