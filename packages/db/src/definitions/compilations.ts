@@ -12,6 +12,7 @@ export const compilations: Definition<"compilations"> = {
       sources: [Source]!
       processedSources: [ProcessedSource]!
       sourceMaps: [SourceMap]
+      contracts: [Contract]!
     }
 
     type Compiler {
@@ -76,6 +77,14 @@ export const compilations: Definition<"compilations"> = {
             compilation: { id },
             index
           }))
+      },
+      contracts: {
+        resolve: ({ id }, _, { workspace }) =>
+          workspace.find("contracts", {
+            selector: {
+              "compilation.id": id
+            }
+          })
       }
     },
 
